@@ -1,0 +1,38 @@
+---
+title: "espstudy"
+author: "Guanchen Zhang"
+date: "December 3, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Get data
+
+```{r message=FALSE}
+library(tidyverse)
+```
+
+```{r}
+# Get raw data
+raw_df <- read_csv("./exoTrain.csv")
+
+head(raw_df)
+```
+
+```{r}
+# Viz one obs
+idx <- 32 #1525
+h_exo_train <- t(raw_df[idx,])
+h_exo_train <- h_exo_train[2:length(h_exo_train)]
+h_exo_train <- tibble(
+  time = 1:length(h_exo_train),
+  flux = h_exo_train
+)
+
+h_exo_train %>%
+  ggplot(aes(x = time, y = flux)) + geom_path()
+```
+
