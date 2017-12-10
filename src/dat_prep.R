@@ -1,8 +1,8 @@
 #! /usr/bin/env Rscript 
 # dat_prep.R
 # 
-# This script reads the downloaded data, compresses the data, 
-# and saves it to a compressed format.
+# This script reads the downloaded data in the data folder, 
+# compresses the data, and saves it to a compressed format.
 
 library(tidyverse)
 
@@ -21,8 +21,9 @@ exit_status <- tryCatch({
   paste("Error: ", err)
   es <- 1
 }, finally = {
-  print("CSV loaded successfully.")
+  print("Success: csv loaded and saved as rds.")
 })
 
+# return exit status for dependencies
 exit_status
 
