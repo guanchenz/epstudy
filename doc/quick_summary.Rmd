@@ -1,0 +1,99 @@
+---
+title: "quick_results"
+author: "GZ"
+date: "December 10, 2017"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Quick results that visualize the flux data
+
+```{r}
+library(tidyverse)
+```
+
+### Load the data from rds
+
+```{r}
+raw <- readRDS('./data/exoTrain.rds')
+star_index <- 3
+```
+
+### Quick look at the data
+
+```{r}
+head(raw[, 1:10])
+```
+
+### Load external functioins for data analysis
+
+```{r}
+source("./src/dat_utils.R")
+```
+
+### Filter the data and apply fourier transform
+
+```{r}
+# get flux series for one star
+series0 <- raw[star_index, ]
+
+# remove outliers
+series_filtered <- rm_upper_outlier(series0)
+
+# fourier transform
+xk <- fft(as.numeric(series_filtered[2:length(series_filtered)]))  # this returns a vector of complex numbers
+harmonics <- 2 * Mod(xk)  # complex numbers to real
+series_fft <- as_tibble(t(harmonics))
+series_fft <- series_fft %>%
+  mutate(LABEL = df_raw[star_index, ]$LABEL) %>%
+  select(LABEL, everything())
+
+names(series_fft) <- colnames(df_raw)
+
+# results
+df <- series_fft
+df[2,] <- series_filtered
+df[3,] <- series0
+df <- df %>% mutate(type = c('frequency', 'time_filtered', 'time0')) %>%
+  select(type, everything())
+```
+
+### Visualize flux data in time and frequency domains
+
+```{r}
+ncols <- dim(df)[2]
+ncols_freq <- round(ncols/2)
+
+# use line to have better viz
+freq_plot_full <- ggplot() +
+  geom_line(aes(1:(ncols_freq-2), as.numeric(df[1, 3:ncols_freq]))) +
+  scale_x_continuous("frequency") +
+  scale_y_continuous("strength") +
+  ggtitle("Flux strength in frequency domain")
+
+# bar
+freq_plot_zoom <- ggplot() +
+  aes(1:20, as.numeric(df[1, 3:22])) +
+  geom_bar(stat = 'identity', width = 0.3) +
+  scale_x_continuous("frequency") +
+  scale_y_continuous("strength") +
+  ggtitle("Flux strength in frequency domain")
+
+tmp2 <- as.numeric(df[2, 3:ncols])
+# tmp3 <- as.numeric(df[3, 3:ncols])
+flux <- ggplot() +
+  geom_line(aes(1:length(tmp2), tmp2)) #+
+  # geom_line(aes(1:length(tmp3), tmp), color = 'red', alpha=0.8)
+```
+
+```{r}
+freq_plot_zoom
+```
+
+```{r}
+flux
+```
+
