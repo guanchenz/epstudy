@@ -31,7 +31,7 @@ head(raw[, 1:10])
 ### Load external functioins for data analysis
 
 ```{r}
-source("../src/dat_utils.R")
+source("./dat_utils.R")
 ```
 
 ### Filter the data and apply fourier transform
