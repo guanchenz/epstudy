@@ -6,7 +6,8 @@ h2o.init(nthreads = -1)
 
 ## Prepare training data
 
-dat_train_range <- 1:1500
+dat_train_cleaned <- series
+dat_train_range <- 1:dim(series)[2]
 dat_train_f <- toFFT(dat_train_cleaned[, dat_train_range])
 
 dat_train <- as.h2o(dat_train_f, destination_frame="dat_train")
@@ -19,8 +20,12 @@ dat_train_scaled[, 2:ncols] <- h2o.scale(dat_train_scaled[,2:ncols])
 ## Prepare test data
 
 test_raw <- read_csv("./data/exoTest.csv")
+test_clean <- test_raw
+for (n in 1:nrow(test_clean)) {
+  test_clean[n,] <- rm_upper_outlier(test_clean[n, ])
+}
 
-dat_test_f <- toFFT(test_raw)
+dat_test_f <- toFFT(test_clean)
 dat_test <- as.h2o(dat_test_f, destination_frame="dat_test")
 dat_test$LABEL <- as.factor(dat_test$LABEL)
 
@@ -30,21 +35,22 @@ dat_test_scaled[, 2:ncols] <- h2o.scale(dat_test_scaled[,2:ncols])
 
 ## Define response and predictors
 y <- "LABEL"
-x <- setdiff(names(data), c(y))
+x <- setdiff(names(dat_train), c(y))
 
 ## Build
 # Random Forest
 rf_fit1 <- h2o.randomForest(x = x,
   y = y,
-  training_frame = data[1:500,],
+  training_frame = dat_train[1:500,],
   model_id = "rf_fit1",
-  balance_classes = TRUE,
-  # class_sampling_factors = c(1, 130),
-  ntree = 200,
+  # balance_classes = TRUE,
+  class_sampling_factors = c(1, 130),
+  # ntree = 200,
   seed = 1)
+h2o.confusionMatrix(rf_fit1)
 
 rf_perf1 <- h2o.performance(model = rf_fit1,
-  newdata = test)
+  newdata = dat_test)
 
 rf_perf1
 
@@ -62,9 +68,12 @@ dl_fit1 <- h2o.deeplearning(x = x,
   # hidden= c(500,500),
   # stopping_rounds = 0,
   balance_classes = TRUE,
-  class_sampling_factors = c(1, 130),
+  # class_sampling_factors = c(1, 130),
   seed = 1)
+h2o.confusionMatrix(dl_fit1)
+# dl_perf1 <- h2o.performance(model = dl_fit1,
+#   newdata = dat_test_scaled[, 1:round(dim(dat_train_scaled)[2]/2)])
 dl_perf1 <- h2o.performance(model = dl_fit1,
-  newdata = dat_test_scaled[, 1:round(dim(dat_train_scaled)[2]/2)])
+    newdata = dat_test_scaled[, idx_trunc])
 dl_perf1
 h2o.auc(dl_perf1)

@@ -30,6 +30,8 @@ toFFT <- function (df) {
   df_transformed <- df_transformed %>%
     mutate(LABEL = df$LABEL[1:nrow(df)]) %>%
     select(LABEL, everything())
+  names(df_transformed) <- colnames(df)
+  return(df_transformed)
 }
 
 # Test and verify
