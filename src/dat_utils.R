@@ -2,7 +2,8 @@
 
 get_upper_outlier <- function (series, q) {
   if (q > 0 & q < 1) {
-    quantile(as.numeric(series), q, na.rm = TRUE)
+    res <- quantile(as.numeric(series), q, na.rm = TRUE)
+    unname(res)
   } else {
     print("Invalid arg q: quantile must be in the range (0, 1).")
     return(NA_real_)
@@ -53,25 +54,4 @@ get_next_index <- function (series_clean, idx_start, thres) {
   }
   return(next_idx)
 }
-
-# test instance
-test_idx <- 3
-series1 <- as.numeric(dat_raw_train[test_idx, 2:dim(dat_raw_train)[2]])
-
-series <- dat_raw_train[1:10,]
-# flux_rm_outlier <- rm_upper_outlier(series)
-
-# flux_rm_outlier <- matrix(, nrow = nrow(series), ncol = dim(series)[2]-1)
-for (n in 1:nrow(series)) {
-  # flux_rm_outlier[n,] <- rm_upper_outlier(series[n,])
-  series[n,] <- rm_upper_outlier(series[n, ])
-}
-
-ncols <- dim(dat_raw_train)[2]
-
-# see the effect after removing the upper outliers
-ggplot() +
-  geom_line(aes(1:(ncols-1), series1)) +
-  geom_line(aes(1:(ncols-1), as.numeric(series[test_idx, 2:ncols])), color = 'red', alpha=0.8)
-  # geom_line(aes(1:(ncols-1), flux_rm_outlier[test_idx,]), color = 'red', alpha=0.8)
 

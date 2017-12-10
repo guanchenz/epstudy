@@ -12,7 +12,7 @@ exit_status <- tryCatch({
     es <- 1
   }, error = function (err) {
     paste("Error: ", err)
-    s1
+    es <- 1
   }, finally = {
     print("Writing file successful.")
   })

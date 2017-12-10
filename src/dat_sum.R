@@ -3,9 +3,10 @@
 # 
 # This script extracts the data for one star and performs
 # Fourier Transform. The output csv file contains both the
-# original flux time series and the data after Fourier Transform
+# original flux time series and the filtered, and the data 
+# after Fourier Transform
 #
-# e.g. Rscript src/dat_sum.R ./data/exoTrain.rds ./data/quick_summary.csv 3
+# e.g. Rscript src/dat_sum.R ./data/exoTrain.rds ./results/quick_summary.csv 3
 
 library(tidyverse)
 
@@ -40,7 +41,8 @@ names(series_fft) <- colnames(df_raw)
 # results
 df <- series_fft
 df[2,] <- series_filtered
-df <- df %>% mutate(type = c('frequency', 'time')) %>%
+df[3,] <- series0
+df <- df %>% mutate(type = c('frequency', 'time_filtered', 'time0')) %>%
   select(type, everything())
 
 write_csv(df, path_output)

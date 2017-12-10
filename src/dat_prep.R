@@ -3,6 +3,8 @@
 # 
 # This script reads the downloaded data in the data folder, 
 # compresses the data, and saves it to a compressed format.
+#
+# E.g.: Rscript src/dat_prep.R ./data/exoTrain.csv ./data/exoTrain.rds
 
 library(tidyverse)
 
