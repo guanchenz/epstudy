@@ -22,3 +22,37 @@ The data contain the flux time series of over 3000 stars in the space. Flux is t
 ### Scope
 
 This analysis is only intended to present the workflow of data retrieval, visualization, processing and analysis.
+
+### How to use
+
+0.   Download the csv file from Kaggle and save it in `./data`.
+
+1.   Compress the large csv file to rds
+
+     -   args: raw csv file, target rds file
+
+```
+Rscript src/dat_prep.R ./data/exoTrain.csv ./data/exoTrain.rds
+```
+
+2.   Extract one star for data processing and visualization (demo only)
+
+     -   args: compressed rds file, target csv file for one star, star index
+     -   star index: from 1 to 3000
+
+```
+Rscript src/dat_sum.R ./data/exoTrain.rds ./results/quick_summary.csv 3
+```
+
+3.   Plot and save
+
+     -   args: csv file for one star, plot saving directory
+
+```
+Rscript src/dat_viz.R ./results/quick_summary.csv ./results/
+```
+
+4.   Render Rmd summary
+
+```
+ezknitr::ezknit("./src/quick_summary.Rmd", out_dir = "./results")
