@@ -1,6 +1,6 @@
 ## A simple data analysis on exoplanet data
 
-Latest release: https://github.com/guanchenz/epstudy/releases/tag/v2.2
+Latest release: https://github.com/guanchenz/epstudy/releases/tag/v2.3
 
 ### Data
 
