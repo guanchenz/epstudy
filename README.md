@@ -1,5 +1,7 @@
 ## A simple data analysis on exoplanet data
 
+Latest release: https://github.com/guanchenz/epstudy/releases/tag/v2.2
+
 ### Data
 
 Data source: https://www.kaggle.com/keplersmachines/kepler-labelled-time-series-data
