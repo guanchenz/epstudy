@@ -11,6 +11,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Quick results that visualize the flux data and the machine learning prediction
 
+_This file is a standalone `.Rmd`. You may modify and render this `.Rmd` without using make._
+
 ```{r}
 # load libraries
 library(tidyverse)

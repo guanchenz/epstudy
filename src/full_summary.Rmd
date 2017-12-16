@@ -9,9 +9,9 @@ output: github_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-## Auto-generate summary (Full verison)
+## Auto-generated summary (Full verison)
 
-```{r message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE}
 # load libraries
 library(tidyverse)
 ```
@@ -32,8 +32,8 @@ The flux data in csv format downloaded from Kaggle is first compressed to rds. B
 ```{r}
 raw <- readRDS('./data/exoTrain.rds')
 
-# Show the first 10 columns of star 2, 10, 20, 50, 60, 70
-head(raw[c(2, 10, 20, 50, 60, 70), 1:10])
+# Show the first 9 columns of star 2, 10, 20, 50, 60, 70
+head(raw[c(2, 10, 20, 50, 60, 70), 1:9])
 ```
 
 As shown above, the data consist of a `LABEL` column and `FLUX` columns (measured at different times). `LABEL` refers to whether the star is confirmed to have at least one planet. `2` indicates yes and `1` refers to no.
@@ -47,6 +47,8 @@ One approach for detecting exoplanets is based on [transit](https://en.wikipedia
 
 Below show the flux time series for the selected star. We are mainly interested in the downward peaks that correspond to the possibility that some planet periodically blocks the light.
 
+_Original flux data_
+
 ![flux time series](../results/figures/flux_original.png)
 
 
@@ -54,8 +56,8 @@ Below show the flux time series for the selected star. We are mainly interested 
 
 The `dat_utils` script includes data utility functions that remove the outliers and perform Fourier Transform.
 
-```{r}
-source("../dat_utils.R")
+```{r eval=FALSE}
+source("./src/dat_utils.R")
 ```
 
 
@@ -97,7 +99,15 @@ df <- df %>% mutate(type = c('frequency', 'time_filtered', 'time0')) %>%
 
 ### Visualize flux data in time and frequency domains
 
+_Filtered vs. original flux data_
+
 ![flux_compare](../results/figures/flux_compare.png)
+
+_Flux data in frequency domain (full spectrum)_
+
+![fft_full](../results/figures/freq_plot_full.png)
+
+_Flux data in frequency domain (zoomed in)_
 
 ![fft](../results/figures/freq_plot_zoom.png)
 
@@ -110,35 +120,58 @@ One of the challenges in the building the model is that the training data is ext
 
 To further address the unbalance in training data, the random forest model is trained with `balance_classes=TRUE`. For details of how to build this model, please refer to `./src/build_mdl_reduce.R`.
 
-```{r warning=FALSE, message=FALSE}
-## Build Random Forest model based on raw data (no removing outliers)
+```{r, eval=FALSE}
+## Build Random Forest model based on raw data
 
 library(h2o)
 
 h2o.init(nthreads = -1)
 
-col_range <- 1:1066
+col_range <- 1:1066  # specify data range
+
+# load data from csv or rds
 # test_raw <- read_csv("../data/exoTest.csv")
-test_raw <- readRDS('./data/exoTest.rds')
+test_raw <- readRDS('../data/exoTest.rds')
+
+# apply FFT or not
 dat_test_f_raw <- test_raw #toFFT(test_raw[, 1:1066])
+
+# to h2o dataframe
 dat_test2 <- as.h2o(dat_test_f_raw[, col_range], destination_frame="dat_test2")
 dat_test2$LABEL <- as.factor(dat_test2$LABEL)
+col_range <- 1:dim(dat_test2)[2]
 
+# scale the data using h2o.scale
 # dat_test_scaled2 <- dat_test2
 # dat_test_scaled2[, 2:dim(dat_test_scaled2)[2]] <- h2o.scale(dat_test_scaled2[, 2:dim(dat_test_scaled2)[2]]) 
 
-col_range <- 1:dim(dat_test2)[2]
-rf_model <- h2o.loadModel("./bin/rf_fit2")
+# load the pre-built model
+rf_model <- h2o.loadModel("../bin/rf_fit2")
 
+# tests
 rf_perf <- h2o.performance(model = rf_model,
   newdata = dat_test2[, col_range])
 
 rf_perf
 ```
 
+```{r, message=FALSE}
+errors <- read_csv("./results/errors.csv")
+confusion <- read_csv("./results/confusion.csv")
+```
+
+```{r, echo=FALSE}
+errors
+```
+
+```{r, echo=FALSE}
+confusion
+```
+
 The results show that the model needs further training. Possible improvement could include:
 
 -   obtain more training and testing data or generate new data from the available data
 -   further filter the data to extract better features and to remove noise
+-   select a better model that fits the problem (possibly recurrent NN)
 
 Nevertheless, we can use the results to locate where the errors occur and to have a close look at the specific stars to find any irregularities.
