@@ -30,11 +30,19 @@ freq_plot_zoom <- ggplot() +
   ggtitle("Flux strength in frequency domain")
 
 tmp2 <- as.numeric(df[2, 3:ncols])
-# tmp3 <- as.numeric(df[3, 3:ncols])
+tmp3 <- as.numeric(df[3, 3:ncols])
 flux <- ggplot() +
-  geom_line(aes(1:length(tmp2), tmp2)) #+
-  # geom_line(aes(1:length(tmp3), tmp), color = 'red', alpha=0.8)
+  geom_line(aes(1:length(tmp3), tmp3, color = 'original')) +
+  geom_line(aes(1:length(tmp2), tmp2, color = 'filtered'), alpha=0.8) +
+  scale_x_continuous("Time") +
+  scale_y_continuous("Flux")
+
+flux_original <- ggplot() +
+  geom_line(aes(1:length(tmp3), tmp3)) +
+  scale_x_continuous("Time") +
+  scale_y_continuous("Flux")
 
 ggsave(paste0(path_output, "freq_plot_full.png"), plot = freq_plot_full)
 ggsave(paste0(path_output, "freq_plot_zoom.png"), plot = freq_plot_zoom)
-ggsave(paste0(path_output, "flux.png"), plot = flux)
+ggsave(paste0(path_output, "flux_compare.png"), plot = flux)
+ggsave(paste0(path_output, "flux_original.png"), plot = flux_original)
