@@ -6,6 +6,7 @@
 exoTrain.csv
 exoTest.csv
 exoTrainProcessed.csv
-
 todo.md
 .vscode/
+packrat/lib*/
+packrat/src/
