@@ -1,5 +1,15 @@
+# Driver script
+# GZ, Dec. 15, 2017
+# Completes demonstration of exoplanets detection (from raw data to rendering report)
+#
+# usage:
+# - make all: generate the full report
+# - make plots: generate plots for a selected star
+# - make bin/rf_fits: re-train the machine learning model with new training data
+# - make clean: clean one intermediate file to allow rendering results for a new star
+# - make clean_all: clean all intermediate results
 
-all: results/full_summary.md
+all: doc/full_summary.md
 
 # Compress data
 data/exoTrain.rds: src/dat_prep.R data/exoTrain.csv
@@ -28,14 +38,25 @@ TARGET_DEPS += results/figures/flux_original.png results/figures/freq_plot_zoom.
 TARGET_DEPS += src/full_summary.Rmd
 TARGET_DEPS += results/errors.csv results/confusion.csv
 
-results/full_summary.md: $(TARGET_DEPS)
-	Rscript -e 'ezknitr::ezknit("./src/full_summary.Rmd", out_dir = "./results")'
+doc/full_summary.md: $(TARGET_DEPS)
+	Rscript -e 'ezknitr::ezknit("./src/full_summary.Rmd", out_dir = "./doc")'
 
 # Re-build model and save to bin
 bin/rf_fit2: data/exoTrainReduced.rds
 	Rscript src/build_mdl_reduce.R
 
+# Save new images (if you only need to see the plots for a star)
+plots: src/dat_viz.R ./data/quick_summary.csv
+	Rscript src/dat_viz.R ./data/quick_summary.csv ./results/figures/
+
 # Clean data/quick_summary.csv to trigger new make all
+# Keep images for report
 clean:
 	rm -f data/quick_summary.csv
-	# rm -f results/figures/*.png
+
+# Remove all intermediate files
+clean_all:
+	rm -f data/quick_summary.csv
+	rm -f results/figures/*.png
+	rm -f results/*.csv
+	rm -f doc/full_summary.html

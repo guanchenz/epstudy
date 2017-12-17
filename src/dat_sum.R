@@ -15,6 +15,10 @@ path_input <- args[1]
 path_output <- args[2]
 star_index <- args[3]
 
+if (length(args) < 3 | is.na(star_index)) {
+  star_index <- 1
+}
+
 raw <- readRDS(path_input)
 df_raw <- as_tibble(raw)
 star_index <- as.integer(star_index)

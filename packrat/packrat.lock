@@ -126,12 +126,6 @@ Version: 0.10.1
 Hash: 54d95f4ec6d0300100413ed0127d89ae
 Requires: stringr
 
-Package: ezknitr
-Source: CRAN
-Version: 0.6
-Hash: e2d98012f67c311dec955e2dc00e33fe
-Requires: R.utils, knitr, markdown
-
 Package: forcats
 Source: CRAN
 Version: 0.2.0
