@@ -45,12 +45,14 @@ doc/full_summary.md: $(TARGET_DEPS)
 Makefile.png: Makefile
 	makefile2graph > Makefile.dot
 	dot -Tpng Makefile.dot -o Makefile.png
+	rm -f Makefile.dot
 
 # Re-build model and save to bin
 bin/rf_fit2: data/exoTrainReduced.rds
 	Rscript src/build_mdl_reduce.R
 
 # Save new images (if you only need to see the plots for a star)
+# To plot for new star, run make clean first then make plots
 plots: src/dat_viz.R ./data/quick_summary.csv
 	Rscript src/dat_viz.R ./data/quick_summary.csv ./results/figures/
 
@@ -63,5 +65,8 @@ clean:
 clean_all:
 	rm -f data/quick_summary.csv
 	rm -f results/figures/*.png
-	rm -f results/*.csv
 	rm -f doc/full_summary.html
+
+# For test only
+remove_makefile_png:
+	rm -f Makefile.png
