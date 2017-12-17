@@ -2,7 +2,9 @@
 title: "auto_summary"
 author: "Guanchen Zhang"
 date: "December 15, 2017"
-output: github_document
+output: 
+  html_document:
+    keep_md: yes
 ---
 
 
