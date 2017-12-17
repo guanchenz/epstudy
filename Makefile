@@ -9,7 +9,7 @@
 # - make clean: clean one intermediate file to allow rendering results for a new star
 # - make clean_all: clean all intermediate results
 
-all: doc/full_summary.md
+all: doc/full_summary.md Makefile.png
 
 # Compress data
 data/exoTrain.rds: src/dat_prep.R data/exoTrain.csv
@@ -40,6 +40,11 @@ TARGET_DEPS += results/errors.csv results/confusion.csv
 
 doc/full_summary.md: $(TARGET_DEPS)
 	Rscript -e 'ezknitr::ezknit("./src/full_summary.Rmd", out_dir = "./doc")'
+
+# Draw dependency graph using makefile2graph
+Makefile.png: Makefile
+	makefile2graph > Makefile.dot
+	dot -Tpng Makefile.dot -o Makefile.png
 
 # Re-build model and save to bin
 bin/rf_fit2: data/exoTrainReduced.rds
